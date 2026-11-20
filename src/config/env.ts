@@ -22,5 +22,6 @@ export const env = {
   stripeSecretKey: process.env.STRIPE_SECRET_KEY ?? "",
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? "",
   stripePriceId: process.env.STRIPE_PRICE_ID ?? "",
+  adminEmail: process.env.ADMIN_EMAIL ?? "",
   isProd: (process.env.NODE_ENV ?? "development") === "production",
 };
