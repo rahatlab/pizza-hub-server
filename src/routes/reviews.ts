@@ -11,6 +11,8 @@ import {
 } from "../middleware/auth.js";
 import { asyncHandler } from "../middleware/error.js";
 import { sendSuccess, sendError } from "../lib/response.js";
+import { emitNewReview } from "../lib/socket.js";
+import { emitNewReview } from "../lib/socket.js";
 
 const router = Router();
 
@@ -68,6 +70,13 @@ router.post(
     });
 
     sendSuccess(res, review, "Review created", 201);
+
+    // Realtime: emit to clients in the item's room
+    try {
+      emitNewReview(itemId, review);
+    } catch {
+      // Socket.io not initialized — client will poll instead
+    }
   })
 );
 
@@ -138,6 +147,13 @@ router.delete(
       return;
     }
     sendSuccess(res, null, "Review deleted");
+
+    // Realtime: emit to clients in the item's room
+    try {
+      emitNewReview(review.itemId.toString(), { deleted: true, reviewId: id });
+    } catch {
+      // Socket.io not initialized — client will poll instead
+    }
   })
 );
 
