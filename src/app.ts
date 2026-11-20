@@ -16,6 +16,9 @@ import vendorMenuRouter from "./routes/vendor-menu.js";
 import uploadRouter from "./routes/upload.js";
 import orderRouter from "./routes/orders.js";
 import vendorOrderRouter from "./routes/vendor-orders.js";
+import adminRouter from "./routes/admin.js";
+import statsRouter from "./routes/stats.js";
+import profileRouter from "./routes/profile.js";
 
 export const app = express();
 
@@ -48,6 +51,15 @@ app.use("/api", orderRouter);
 
 /** Vendor orders */
 app.use("/api/vendor/orders", vendorOrderRouter);
+
+/** Admin APIs */
+app.use("/api/admin", adminRouter);
+
+/** Stats (vendor/customer dashboards) */
+app.use("/api", statsRouter);
+
+/** Profile */
+app.use("/api", profileRouter);
 
 /** Raw body route(s) must come before express.json() — none yet (Stripe webhook in Part 8). */
 
