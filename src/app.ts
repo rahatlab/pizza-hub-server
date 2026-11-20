@@ -20,6 +20,7 @@ import adminRouter from "./routes/admin.js";
 import statsRouter from "./routes/stats.js";
 import profileRouter from "./routes/profile.js";
 import reviewRouter from "./routes/reviews.js";
+import paymentRouter, { webhookRouter } from "./routes/payment.js";
 
 export const app = express();
 
@@ -30,6 +31,10 @@ app.use(
     credentials: true,
   })
 );
+
+/** Stripe webhook needs RAW body — mount BEFORE express.json() */
+app.use("/api/payment/webhook", webhookRouter);
+
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 
@@ -65,7 +70,8 @@ app.use("/api", profileRouter);
 /** Reviews */
 app.use("/api/reviews", reviewRouter);
 
-/** Raw body route(s) must come before express.json() — none yet (Stripe webhook in Part 8). */
+/** Payment checkout (vendor premium subscription) */
+app.use("/api/payment", paymentRouter);
 
 app.use((_req: Request, res: Response) => {
   sendError(res, "NOT_FOUND", "Route not found");
