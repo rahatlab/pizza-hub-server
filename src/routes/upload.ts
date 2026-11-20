@@ -47,7 +47,10 @@ router.post(
       return;
     }
 
-    const data = await imgbbRes.json();
+    const data = (await imgbbRes.json()) as {
+      success: boolean;
+      data?: { url: string; delete_url: string };
+    };
     if (!data.success || !data.data?.url) {
       sendError(res, "INTERNAL_SERVER_ERROR", "ImgBB returned invalid response");
       return;
