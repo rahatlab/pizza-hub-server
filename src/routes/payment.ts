@@ -16,9 +16,19 @@ import { env } from "../config/env.js";
 
 const router = Router();
 
-const stripe = new Stripe(env.stripeSecretKey, {
-  apiVersion: "2025-02-24.acacia",
-});
+/** Lazy Stripe instance (key supplied via .env at runtime) */
+let stripeInstance: Stripe | null = null;
+function getStripe(): Stripe {
+  if (!stripeInstance) {
+    if (!env.stripeSecretKey) {
+      throw new Error("STRIPE_SECRET_KEY not configured");
+    }
+    stripeInstance = new Stripe(env.stripeSecretKey, {
+      apiVersion: "2025-02-24.acacia",
+    });
+  }
+  return stripeInstance;
+}
 
 /** POST /api/payment/checkout — vendor creates Stripe Checkout session */
 router.post(
@@ -52,7 +62,7 @@ router.post(
       return;
     }
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripe().checkout.sessions.create({
       mode: "subscription",
       payment_method_types: ["card"],
       line_items: [{ price: env.stripePriceId, quantity: 1 }],
@@ -87,7 +97,7 @@ webhookRouter.post(
 
     let event: Stripe.Event;
     try {
-      event = stripe.webhooks.constructEvent(
+      event = getStripe().webhooks.constructEvent(
         req.body as Buffer,
         sig as string,
         env.stripeWebhookSecret
@@ -138,3 +148,4 @@ webhookRouter.post(
     res.status(200).json({ received: true });
   })
 );
+
