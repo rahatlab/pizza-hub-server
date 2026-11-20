@@ -20,7 +20,8 @@ async function seed(): Promise<void> {
     email,
     name,
     role,
-    blocked: false,
+    isBlocked: false,
+    subscriptionPlan: "free",
   });
 
   console.log(`✅ Admin seeded: ${admin.email} / id ${admin.id} / role ${admin.role}`);
