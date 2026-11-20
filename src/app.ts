@@ -11,6 +11,7 @@ import { sendError } from "./lib/response.js";
 import { errorMiddleware } from "./middleware/error.js";
 import { healthRouter } from "./routes/health.js";
 import authRouter from "./routes/auth.js";
+import menuRouter from "./routes/menu.js";
 
 export const app = express();
 
@@ -28,6 +29,9 @@ app.use("/api/health", healthRouter);
 
 /** better-auth + custom JWT issue at /api/auth/* */
 app.use("/api/auth", authRouter);
+
+/** Public menu */
+app.use("/api/menu", menuRouter);
 
 /** Raw body route(s) must come before express.json() — none yet (Stripe webhook in Part 8). */
 
