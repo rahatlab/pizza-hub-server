@@ -19,13 +19,11 @@ const orderSchema = new Schema<IOrder>(
       type: Schema.Types.ObjectId,
       ref: "MenuItem",
       required: true,
-      index: true,
     },
     vendorId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true,
     },
     customerId: {
       type: Schema.Types.ObjectId,

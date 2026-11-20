@@ -15,7 +15,6 @@ const reviewSchema = new Schema<IReview>(
       type: Schema.Types.ObjectId,
       ref: "MenuItem",
       required: true,
-      index: true,
     },
     customerId: {
       type: Schema.Types.ObjectId,
@@ -27,7 +26,6 @@ const reviewSchema = new Schema<IReview>(
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true,
     },
     rating: { type: Number, required: true, min: 1, max: 5 },
     comment: { type: String, required: true },
