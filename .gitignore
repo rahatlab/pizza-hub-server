@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+
+# env files — real values never committed
+.env
+.env.*
+!.env.example
+
+# build
+dist/
+build/
+
+# logs
+*.log
+npm-debug.log*
+
+# misc
+.DS_Store
+coverage/
