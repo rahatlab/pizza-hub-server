@@ -13,6 +13,7 @@ export const env = {
   nodeEnv: process.env.NODE_ENV ?? "development",
   clientUrl: process.env.CLIENT_URL ?? "http://localhost:3000",
   mongodbUri: required("MONGODB_URI", "mongodb://localhost:27017/pizzahub"),
+  mongodbDbName: process.env.MONGODB_DB_NAME ?? "pizzahub",
   jwtSecret: required("JWT_SECRET", "dev-secret-change-me"),
   betterAuthSecret: process.env.BETTER_AUTH_SECRET ?? "",
   betterAuthUrl: process.env.BETTER_AUTH_URL ?? "http://localhost:5000",

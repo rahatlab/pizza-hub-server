@@ -8,7 +8,9 @@ import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import { env } from "./config/env.js";
 import { sendError } from "./lib/response.js";
+import { errorMiddleware } from "./middleware/error.js";
 import { healthRouter } from "./routes/health.js";
+import authRouter from "./routes/auth.js";
 
 export const app = express();
 
@@ -24,22 +26,13 @@ app.use(cookieParser());
 
 app.use("/api/health", healthRouter);
 
+/** better-auth + custom JWT issue at /api/auth/* */
+app.use("/api/auth", authRouter);
+
+/** Raw body route(s) must come before express.json() — none yet (Stripe webhook in Part 8). */
+
 app.use((_req: Request, res: Response) => {
   sendError(res, "NOT_FOUND", "Route not found");
 });
 
-app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
-  const isPayloadTooLarge =
-    typeof err === "object" &&
-    err !== null &&
-    "type" in err &&
-    (err as { type?: string }).type === "entity.too.large";
-
-  if (isPayloadTooLarge) {
-    sendError(res, "PAYLOAD_TOO_LARGE", "Payload too large");
-    return;
-  }
-
-  console.error(err);
-  sendError(res, "INTERNAL_SERVER_ERROR", "Something went wrong");
-});
+app.use(errorMiddleware);
