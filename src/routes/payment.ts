@@ -17,7 +17,7 @@ import { env } from "../config/env.js";
 const router = Router();
 
 const stripe = new Stripe(env.stripeSecretKey, {
-  apiVersion: "2024-12-18.acacia",
+  apiVersion: "2025-02-24.acacia",
 });
 
 /** POST /api/payment/checkout — vendor creates Stripe Checkout session */
@@ -40,10 +40,13 @@ router.post(
     }
 
     // Check if already premium and not expired
+    const userDoc = await User.findById(user._id).select(
+      "subscriptionPlan subscriptionExpiresAt"
+    );
     if (
-      user.subscriptionPlan === "premium" &&
-      user.subscriptionExpiresAt &&
-      new Date(user.subscriptionExpiresAt) > new Date()
+      userDoc?.subscriptionPlan === "premium" &&
+      userDoc.subscriptionExpiresAt &&
+      new Date(userDoc.subscriptionExpiresAt) > new Date()
     ) {
       sendError(res, "CONFLICT", "You already have an active premium subscription");
       return;
