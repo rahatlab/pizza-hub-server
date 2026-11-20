@@ -38,8 +38,9 @@ router.get(
       price_desc: -1,
     };
     const sortOption: Record<string, 1 | -1> = {};
-    if (sortMap[String(sort)] !== undefined) {
-      sortOption.price = sortMap[String(sort)];
+    const sortVal = sortMap[String(sort)];
+    if (sortVal !== undefined) {
+      sortOption.price = sortVal;
     } else {
       sortOption.createdAt = -1;
     }
