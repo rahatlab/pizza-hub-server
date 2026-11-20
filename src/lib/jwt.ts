@@ -8,7 +8,7 @@ export interface TokenPayload {
 }
 
 const SIGN_DEFAULTS: SignOptions = {
-  expiresIn: env.jwtExpiresIn as SignOptions["expiresIn"],
+  expiresIn: "7d",
   issuer: "pizzahub",
 };
 
