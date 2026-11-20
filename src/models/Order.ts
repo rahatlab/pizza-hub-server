@@ -1,4 +1,5 @@
 import { model, Schema, type Document, Types } from "mongoose";
+import mongoose from "mongoose";
 
 export type OrderStatus = "pending" | "accepted" | "rejected" | "cancelled";
 

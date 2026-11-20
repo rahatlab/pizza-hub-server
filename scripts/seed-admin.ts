@@ -1,6 +1,6 @@
-import { connectDB } from "../lib/db";
-import { User } from "../models/User";
-import { env } from "../config/env";
+import { connectDB } from "../src/lib/db.js";
+import { User } from "../src/models/User.js";
+import { env } from "../src/config/env.js";
 
 async function seed(): Promise<void> {
   await connectDB();
