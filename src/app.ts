@@ -19,6 +19,7 @@ import vendorOrderRouter from "./routes/vendor-orders.js";
 import adminRouter from "./routes/admin.js";
 import statsRouter from "./routes/stats.js";
 import profileRouter from "./routes/profile.js";
+import reviewRouter from "./routes/reviews.js";
 
 export const app = express();
 
@@ -60,6 +61,9 @@ app.use("/api", statsRouter);
 
 /** Profile */
 app.use("/api", profileRouter);
+
+/** Reviews */
+app.use("/api/reviews", reviewRouter);
 
 /** Raw body route(s) must come before express.json() — none yet (Stripe webhook in Part 8). */
 
