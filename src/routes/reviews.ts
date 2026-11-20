@@ -12,7 +12,6 @@ import {
 import { asyncHandler } from "../middleware/error.js";
 import { sendSuccess, sendError } from "../lib/response.js";
 import { emitNewReview } from "../lib/socket.js";
-import { emitNewReview } from "../lib/socket.js";
 
 const router = Router();
 
