@@ -3,13 +3,15 @@ import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { MongoClient } from "mongodb";
 import { env } from "../config/env.js";
 
-/** Singleton MongoDB client + db for better-auth adapter. */
-const client = new MongoClient(env.mongodbUri);
+let client: MongoClient | null = null;
 let db: import("mongodb").Db | null = null;
 
 export async function getAuthDb(): Promise<import("mongodb").Db> {
   if (db) return db;
-  await client.connect();
+  if (!client) {
+    client = new MongoClient(env.mongodbUri);
+    await client.connect();
+  }
   db = client.db(env.mongodbDbName);
   return db;
 }

@@ -8,14 +8,6 @@ import { ErrorCodes } from "../lib/response.js";
 
 const router = Router();
 
-/** better-auth standard routes: /api/auth/sign-in, /sign-up, /sign-out, /session, etc. */
-router.use(
-  "/",
-  async (req, res, next) => {
-    await toNodeHandler(auth)(req, res as any).catch(next);
-  }
-);
-
 /**
  * POST /api/auth/jwt
  * Verify better-auth session (cookie) → issue our own JWT { userId, email, role }.
@@ -32,7 +24,7 @@ router.post(
         sendError(res, "UNAUTHORIZED", "Authentication required. Please log in to continue.");
         return;
       }
-      const user = await User.findById(session.user.id).select(
+      const user = await User.findOne({ authId: session.user.id }).select(
         "name email role isBlocked"
       );
       if (!user || user.isBlocked) {
@@ -48,6 +40,14 @@ router.post(
     } catch {
       sendError(res, "UNAUTHORIZED", "Session invalid. Please log in again.");
     }
+  }
+);
+
+/** better-auth standard routes: /api/auth/sign-in, /sign-up, /sign-out, /session, etc. */
+router.use(
+  "/",
+  async (req, res, next) => {
+    await toNodeHandler(auth)(req, res as any).catch(next);
   }
 );
 

@@ -6,7 +6,9 @@ let cached: mongoose.Mongoose | null = null;
 /** Singleton connection for serverless-safe dev hot-reloads. */
 export async function connectDB(): Promise<mongoose.Mongoose> {
   if (cached) return cached;
-  cached = await mongoose.connect(env.mongodbUri);
+  cached = await mongoose.connect(env.mongodbUri, {
+    dbName: env.mongodbDbName,
+  });
   console.log("🗄️  MongoDB connected:", env.mongodbUri);
   return cached;
 }

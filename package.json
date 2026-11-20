@@ -8,6 +8,7 @@
     "build": "tsc --noEmit",
     "start": "tsx src/index.ts",
     "seed": "tsx scripts/seed-admin.ts",
+    "test": "vitest run",
     "lint": "eslint ."
   },
   "dependencies": {
@@ -33,6 +34,8 @@
     "@types/node": "^20",
     "@types/three": "^0.187.0",
     "tsx": "^4.19.2",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.1"
   }
 }

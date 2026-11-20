@@ -23,7 +23,7 @@ const customerAuth = [
 
 /** POST /api/orders — customer role · auto-detect customer/vendor/item · status pending */
 router.post(
-  "/",
+  "/orders",
   ...customerAuth,
   asyncHandler(async (req, res) => {
     const user = req.user as AuthUser & { _id: string };
