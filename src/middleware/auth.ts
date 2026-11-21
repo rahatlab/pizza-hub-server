@@ -1,10 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
-import jwt from "jsonwebtoken";
-import { env } from "../config/env.js";
 import { forbidden, unauthorized } from "../lib/response.js";
+import { verifyToken, type Role } from "../lib/token.js";
 
-/** Roles allowed on the platform. Admin is never granted via public registration. */
-export type Role = "admin" | "vendor" | "customer";
+export type { Role };
 
 /** Shape attached to `req.auth` after a token verifies successfully. */
 export interface AuthUser {
@@ -25,8 +23,9 @@ declare global {
 /**
  * Verifies the JWT sent as `Authorization: Bearer <token>`.
  *
- * Never trusts a role or user id sent in the body/query — the token is the
- * only source of identity. Returns 401 for missing/invalid/expired tokens.
+ * The token is the ONLY source of identity — a role or user id sent in the
+ * body or query string is never trusted. Missing, malformed or expired
+ * tokens all return 401 with a message the client can show verbatim.
  */
 export function requireAuth(req: Request, res: Response, next: NextFunction): void {
   const header = req.headers.authorization;
@@ -37,28 +36,17 @@ export function requireAuth(req: Request, res: Response, next: NextFunction): vo
     return;
   }
 
-  try {
-    const decoded = jwt.verify(token, env.JWT_SECRET) as jwt.JwtPayload;
-    if (typeof decoded.sub !== "string" || typeof decoded.role !== "string") {
-      unauthorized(res, "Malformed authentication token");
-      return;
-    }
-    req.auth = {
-      id: decoded.sub,
-      role: decoded.role as Role,
-      email: typeof decoded.email === "string" ? decoded.email : "",
-    };
-    next();
-  } catch (error) {
-    const message =
-      error instanceof jwt.TokenExpiredError
-        ? "Your session has expired, please sign in again"
-        : "Invalid authentication token";
-    unauthorized(res, message);
+  const payload = verifyToken(token);
+  if (!payload) {
+    unauthorized(res, "Your session is invalid or has expired, please sign in again");
+    return;
   }
+
+  req.auth = { id: payload.sub, role: payload.role, email: payload.email };
+  next();
 }
 
-/** Role gate — returns 403 (not 401) when the role does not match. */
+/** Role gate — 403 (not 401) when authenticated but not permitted. */
 export function requireRole(...roles: Role[]) {
   return (req: Request, res: Response, next: NextFunction): void => {
     if (!req.auth) {
@@ -74,8 +62,8 @@ export function requireRole(...roles: Role[]) {
 }
 
 /**
- * Ownership guard. `resolveOwnerId` extracts the owning user id from the
- * loaded resource; admins pass through, everyone else must match.
+ * Ownership guard. `resolveOwnerId` loads the resource and returns its
+ * owning user id; admins pass through, everyone else must match.
  */
 export function requireOwnership(
   resolveOwnerId: (req: Request) => string | undefined | Promise<string | undefined>,
