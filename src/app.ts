@@ -7,6 +7,7 @@ import { clientOrigins, env } from "./config/env.js";
 import { getAuth } from "./lib/auth.js";
 import { errorHandler, notFoundHandler } from "./middleware/error.js";
 import { accountRouter } from "./routes/account.js";
+import { adminRouter } from "./routes/admin.js";
 import { healthRouter } from "./routes/health.js";
 import { menuRouter } from "./routes/menu.js";
 import { orderRouter } from "./routes/orders.js";
@@ -59,6 +60,7 @@ export function createApp(): express.Express {
 
   app.use("/api/health", healthRouter);
   app.use("/api/account", accountRouter);
+  app.use("/api/admin", adminRouter);
   app.use("/api/upload", uploadRouter);
   app.use("/api/menu", menuRouter);
   app.use("/api/orders", orderRouter);
