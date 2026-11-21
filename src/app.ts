@@ -2,10 +2,13 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
+import { toNodeHandler } from "better-auth/node";
 import { clientOrigins, env } from "./config/env.js";
+import { getAuth } from "./lib/auth.js";
 import { errorHandler, notFoundHandler } from "./middleware/error.js";
-import { authRouter } from "./routes/auth.js";
+import { accountRouter } from "./routes/account.js";
 import { healthRouter } from "./routes/health.js";
+import { uploadRouter } from "./routes/upload.js";
 
 export function createApp(): express.Express {
   const app = express();
@@ -25,6 +28,12 @@ export function createApp(): express.Express {
       methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
     }),
   );
+
+  // Better Auth reads the raw request stream itself, so its catch-all has to
+  // be mounted BEFORE express.json(). Everything under /api/auth — sign-up,
+  // sign-in, Google callback, sign-out — is handled by this one route.
+  app.all("/api/auth/*", toNodeHandler(getAuth()));
+
   app.use(express.json({ limit: "2mb" }));
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
@@ -46,7 +55,8 @@ export function createApp(): express.Express {
   });
 
   app.use("/api/health", healthRouter);
-  app.use("/api/auth", authRouter);
+  app.use("/api/account", accountRouter);
+  app.use("/api/upload", uploadRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

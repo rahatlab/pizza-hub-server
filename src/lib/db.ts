@@ -15,7 +15,10 @@ export async function connectDB(): Promise<typeof mongoose> {
   if (connecting) return connecting;
 
   connecting = mongoose
-    .connect(env.MONGODB_URI, { serverSelectionTimeoutMS: 10_000 })
+    .connect(env.MONGODB_URI, {
+      dbName: env.MONGODB_DB_NAME,
+      serverSelectionTimeoutMS: 10_000,
+    })
     .then((m) => {
       console.log(`→ MongoDB connected: ${m.connection.host}/${m.connection.name}`);
       return m;

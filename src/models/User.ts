@@ -28,9 +28,9 @@ const userSchema = new Schema(
       trim: true,
       index: true,
     },
-    // Omitted from queries by default — must be explicitly selected and
-    // then compared with bcrypt, never returned to a client.
-    password: { type: String, required: true, select: false },
+    // Better Auth keeps the password hash in its own `accounts` collection,
+    // so this document never holds a credential.
+    emailVerified: { type: Boolean, default: false },
 
     role: {
       type: String,
