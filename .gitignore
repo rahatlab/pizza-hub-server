@@ -1,0 +1,25 @@
+# dependencies
+node_modules/
+
+# environment variables — NEVER commit
+.env
+.env.*
+!.env.example
+
+# build output
+dist/
+*.tsbuildinfo
+
+# logs
+logs/
+*.log
+npm-debug.log*
+
+# editors / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# coverage
+coverage/
