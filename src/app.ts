@@ -11,6 +11,7 @@ import { healthRouter } from "./routes/health.js";
 import { menuRouter } from "./routes/menu.js";
 import { orderRouter } from "./routes/orders.js";
 import { uploadRouter } from "./routes/upload.js";
+import { vendorRouter } from "./routes/vendor.js";
 
 export function createApp(): express.Express {
   const app = express();
@@ -61,6 +62,7 @@ export function createApp(): express.Express {
   app.use("/api/upload", uploadRouter);
   app.use("/api/menu", menuRouter);
   app.use("/api/orders", orderRouter);
+  app.use("/api/vendor", vendorRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);
