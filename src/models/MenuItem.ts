@@ -64,6 +64,11 @@ menuItemSchema.index({ itemName: "text", description: "text", location: "text" }
 menuItemSchema.index({ status: 1, price: 1 });
 menuItemSchema.index({ category: 1, price: -1 });
 
-export type MenuItemDoc = InferSchemaType<typeof menuItemSchema>;
+export type MenuItemDoc = InferSchemaType<typeof menuItemSchema> & {
+  _id: mongoose.Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export const MenuItem: Model<MenuItemDoc> =
   mongoose.models.MenuItem ?? mongoose.model<MenuItemDoc>("MenuItem", menuItemSchema);

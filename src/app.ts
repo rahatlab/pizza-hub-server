@@ -8,6 +8,7 @@ import { getAuth } from "./lib/auth.js";
 import { errorHandler, notFoundHandler } from "./middleware/error.js";
 import { accountRouter } from "./routes/account.js";
 import { healthRouter } from "./routes/health.js";
+import { menuRouter } from "./routes/menu.js";
 import { uploadRouter } from "./routes/upload.js";
 
 export function createApp(): express.Express {
@@ -57,6 +58,7 @@ export function createApp(): express.Express {
   app.use("/api/health", healthRouter);
   app.use("/api/account", accountRouter);
   app.use("/api/upload", uploadRouter);
+  app.use("/api/menu", menuRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);
