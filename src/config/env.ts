@@ -30,6 +30,8 @@ const envSchema = z.object({
   STRIPE_SECRET_KEY: z.string().optional().default(""),
   STRIPE_WEBHOOK_SECRET: z.string().optional().default(""),
   STRIPE_PRICE_ID: z.string().optional().default(""),
+  STRIPE_PUBLISHABLE_KEY: z.string().optional().default(""),
+  PUBLISH_KEY: z.string().optional().default(""),
 
   IMGBB_API_KEY: z.string().optional().default(""),
 });
