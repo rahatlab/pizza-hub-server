@@ -334,3 +334,34 @@ menuRouter.post(
     }, "Review added");
   }),
 );
+
+/**
+ * POST /api/menu/:id/favorite — toggle a customer's favourite (wishlist).
+ */
+menuRouter.post(
+  "/:id/favorite",
+  requireAuth,
+  requireRole("customer"),
+  asyncHandler(async (req, res) => {
+    await connectDB();
+    const item = await MenuItem.findById(req.params.id);
+    if (!item || item.status !== "approved") {
+      notFound(res, "Menu item not found");
+      return;
+    }
+    const user = await User.findById(req.auth!.id);
+    if (!user) {
+      notFound(res, "Account not found");
+      return;
+    }
+    const itemId = item._id;
+    const idx = (user.favoriteItemIds ?? []).findIndex((id) => id.toString() === itemId.toString());
+    if (idx >= 0) {
+      user.favoriteItemIds.splice(idx, 1);
+    } else {
+      user.favoriteItemIds.push(itemId);
+    }
+    await user.save();
+    return ok(res, { favorite: idx < 0, favoriteItemIds: user.favoriteItemIds.map((id) => id.toString()) }, idx < 0 ? "Added to favourites" : "Removed from favourites");
+  }),
+);
