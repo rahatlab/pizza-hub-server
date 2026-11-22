@@ -2,6 +2,7 @@ import { Router } from "express";
 import { env } from "../config/env.js";
 import { badRequest, ok, serverError } from "../lib/response.js";
 import { asyncHandler } from "../middleware/error.js";
+import { requireAuth } from "../middleware/auth.js";
 
 export const uploadRouter = Router();
 
@@ -45,6 +46,7 @@ interface ImgBbResponse {
  */
 uploadRouter.post(
   "/",
+  requireAuth,
   asyncHandler(async (req, res) => {
     if (!env.IMGBB_API_KEY) {
       serverError(res, "Image hosting is not configured on this server");
