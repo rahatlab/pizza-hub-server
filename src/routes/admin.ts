@@ -39,8 +39,15 @@ adminRouter.get(
   asyncHandler(async (req, res) => {
     await connectDB();
     const status = typeof req.query.status === "string" ? req.query.status : undefined;
+    const search = typeof req.query.search === "string" ? req.query.search.trim() : "";
     const filter: Record<string, unknown> = {};
     if (status) filter.status = status;
+    if (search) {
+      filter.$or = [
+        { itemName: { $regex: search, $options: "i" } },
+        { location: { $regex: search, $options: "i" } },
+      ];
+    }
     const items = await MenuItem.find(filter).sort({ createdAt: -1 }).lean();
     // Attach vendor name
     const vendorIds = [...new Set(items.map((i) => i.vendorId.toString()))];
