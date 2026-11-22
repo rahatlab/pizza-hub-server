@@ -54,8 +54,8 @@ stripeRouter.post(
       mode: "subscription",
       customer: customerId,
       line_items: [{ price: env.STRIPE_PRICE_ID, quantity: 1 }],
-      success_url: `${env.APP_URL}/dashboard?upgrade=success`,
-      cancel_url: `${env.APP_URL}/dashboard?upgrade=cancelled`,
+      success_url: `${env.APP_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${env.APP_URL}/payment-cancel`,
       metadata: { userId: vendor._id.toString() },
       subscription_data: {
         metadata: { userId: vendor._id.toString() },
