@@ -123,8 +123,15 @@ vendorRouter.get(
   asyncHandler(async (req, res) => {
     await connectDB();
     const role = typeof req.query.role === "string" ? req.query.role : undefined;
+    const search = typeof req.query.search === "string" ? req.query.search.trim() : "";
     const filter: Record<string, unknown> = {};
     if (role) filter.role = role;
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+      ];
+    }
     const users = await User.find(filter).sort({ createdAt: -1 }).lean();
     return ok(res, {
       users: users.map((u) => ({
@@ -134,6 +141,7 @@ vendorRouter.get(
         role: u.role,
         image: u.image ?? "",
         plan: u.plan,
+        isBlocked: u.isBlocked ?? false,
         createdAt: u.createdAt,
         businessName: u.businessName,
       })),
@@ -199,5 +207,30 @@ vendorRouter.patch(
     user.role = role;
     await user.save();
     return ok(res, { id: user._id.toString(), role: user.role }, "Role updated");
+  }),
+);
+
+/**
+ * PATCH /api/admin/users/:id/block — block/unblock a user (admin only).
+ */
+vendorRouter.patch(
+  "/admin/users/:id/block",
+  requireAuth,
+  requireRole("admin"),
+  asyncHandler(async (req, res) => {
+    await connectDB();
+    const { blocked } = z.object({ blocked: z.boolean() }).parse(req.body);
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      notFound(res, "User not found");
+      return;
+    }
+    if (user.role === "admin") {
+      badRequest(res, "Admin accounts cannot be blocked");
+      return;
+    }
+    user.isBlocked = blocked;
+    await user.save();
+    return ok(res, { id: user._id.toString(), isBlocked: user.isBlocked }, blocked ? "User blocked" : "User unblocked");
   }),
 );

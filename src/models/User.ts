@@ -31,6 +31,7 @@ const userSchema = new Schema(
     // Better Auth keeps the password hash in its own `accounts` collection,
     // so this document never holds a credential.
     emailVerified: { type: Boolean, default: false },
+    isBlocked: { type: Boolean, default: false, index: true },
 
     role: {
       type: String,

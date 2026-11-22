@@ -1,5 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { forbidden, unauthorized } from "../lib/response.js";
+import { connectDB } from "../lib/db.js";
+import { User } from "../models/User.js";
 import { verifyToken, type Role } from "../lib/token.js";
 
 export type { Role };
@@ -42,8 +44,25 @@ export function requireAuth(req: Request, res: Response, next: NextFunction): vo
     return;
   }
 
-  req.auth = { id: payload.sub, role: payload.role, email: payload.email };
-  next();
+  // Enforce blocked-user restriction server-side (assignment requirement).
+  void (async () => {
+    try {
+      await connectDB();
+      const user = await User.findById(payload.sub).select("isBlocked role").lean();
+      if (!user) {
+        unauthorized(res, "Account no longer exists");
+        return;
+      }
+      if (user.isBlocked) {
+        forbidden(res, "Your account has been blocked. Contact support.");
+        return;
+      }
+      req.auth = { id: payload.sub, role: (user.role as Role) ?? payload.role, email: payload.email };
+      next();
+    } catch (error) {
+      next(error);
+    }
+  })();
 }
 
 /** Role gate — 403 (not 401) when authenticated but not permitted. */

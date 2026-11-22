@@ -18,6 +18,7 @@ export function publicUser(user: UserDoc) {
     name: user.name,
     email: user.email,
     role: user.role,
+    isBlocked: user.isBlocked ?? false,
     image: user.image ?? "",
     phone: user.phone ?? "",
     address: user.address ?? "",
