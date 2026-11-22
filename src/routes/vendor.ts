@@ -6,31 +6,12 @@ import { requireAuth, requireRole } from "../middleware/auth.js";
 import { asyncHandler } from "../middleware/error.js";
 import { MenuItem, type MenuItemDoc } from "../models/MenuItem.js";
 import { User } from "../models/User.js";
+import { publicItem } from "./menu.js";
 
 export const vendorRouter = Router();
 
-// Re-export publicItem from menu router by redefining here for clarity
-function publicItem(item: MenuItemDoc) {
-  return {
-    id: item._id.toString(),
-    itemName: item.itemName,
-    description: item.description,
-    category: item.category,
-    price: item.price,
-    location: item.location,
-    images: item.images ?? [],
-    vendorId: item.vendorId.toString(),
-    status: item.status,
-    ratingAvg: item.ratingAvg ?? 0,
-    ratingCount: item.ratingCount ?? 0,
-    reviewCount: item.reviews?.length ?? 0,
-    createdAt: item.createdAt,
-    updatedAt: item.updatedAt,
-  };
-}
-
 /**
- * GET /api/vendor/menu — the vendor's own items (all statuses).
+ * GET /api/vendor/menu - the vendor's own items (all statuses).
  */
 vendorRouter.get(
   "/menu",
@@ -232,5 +213,34 @@ vendorRouter.patch(
     user.isBlocked = blocked;
     await user.save();
     return ok(res, { id: user._id.toString(), isBlocked: user.isBlocked }, blocked ? "User blocked" : "User unblocked");
+  }),
+);
+
+/**
+ * GET /api/vendor/public/:id — public vendor storefront (info + approved items).
+ */
+vendorRouter.get(
+  "/public/:id",
+  asyncHandler(async (req, res) => {
+    await connectDB();
+    const vendor = await User.findById(req.params.id).lean();
+    if (!vendor || vendor.role !== "vendor") {
+      notFound(res, "Vendor not found");
+      return;
+    }
+    const items = await MenuItem.find({ vendorId: vendor._id, status: "approved" })
+      .sort({ createdAt: -1 })
+      .lean();
+    return ok(res, {
+      vendor: {
+        id: vendor._id.toString(),
+        name: vendor.name,
+        businessName: vendor.businessName ?? "",
+        businessLocation: vendor.businessLocation ?? "",
+        image: vendor.image ?? "",
+        plan: vendor.plan,
+      },
+      items: items.map((item) => publicItem(item as unknown as MenuItemDoc)),
+    });
   }),
 );

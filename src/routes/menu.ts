@@ -65,6 +65,7 @@ menuRouter.get(
     const search = typeof req.query.search === "string" ? req.query.search.trim() : "";
     const category = typeof req.query.category === "string" ? req.query.category.trim() : "";
     const location = typeof req.query.location === "string" ? req.query.location.trim() : "";
+    const vendorId = typeof req.query.vendorId === "string" ? req.query.vendorId.trim() : "";
     const sort = typeof req.query.sort === "string" ? req.query.sort : "newest";
     const minPrice = req.query.minPrice ? Number(req.query.minPrice) : undefined;
     const maxPrice = req.query.maxPrice ? Number(req.query.maxPrice) : undefined;
@@ -86,6 +87,7 @@ menuRouter.get(
 
     const filter: Record<string, unknown> = { status: "approved" };
     if (category) filter.category = category;
+    if (vendorId) filter.vendorId = vendorId;
     if (location) filter.location = { $regex: location, $options: "i" };
     if (minPrice !== undefined || maxPrice !== undefined) {
       const range: Record<string, number> = {};
@@ -153,8 +155,12 @@ menuRouter.get(
       notFound(res, "Menu item not found");
       return;
     }
+    const vendor = await User.findById(item.vendorId).lean();
     return ok(res, {
       ...publicItem(item),
+      vendor: vendor
+        ? { id: vendor._id.toString(), name: vendor.name, businessName: vendor.businessName ?? "" }
+        : null,
       reviews: item.reviews.map((review) => ({
         id: review._id.toString(),
         customerId: review.customerId.toString(),
