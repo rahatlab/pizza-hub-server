@@ -119,7 +119,7 @@ stripeRouter.post(
         vendor.plan = "premium";
         vendor.stripeCustomerId = session.customer as string;
         vendor.stripeSubscriptionId = session.subscription as string;
-        vendor.premiumUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+        vendor.premiumUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
         await vendor.save();
 
         await Transaction.create({
@@ -131,7 +131,7 @@ stripeRouter.post(
           currency: session.currency ?? "usd",
           plan: "premium",
           status: "completed",
-          description: "Premium subscription — annual",
+          description: "Premium subscription - monthly",
         });
 
         console.log(`✓ Vendor ${vendor.email} upgraded to Premium`);
