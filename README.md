@@ -12,6 +12,18 @@ Built with Express 4, TypeScript, Mongoose, Better Auth, JWT, Stripe.
 - **Payments**: Stripe (vendor Premium subscription only)
 - **Image hosting**: ImgBB (proxied through `/api/upload`)
 
+### npm packages used
+
+`express`, `mongoose`, `better-auth`, `zod`, `jsonwebtoken`, `bcryptjs`,
+`cookie-parser`, `cors`, `helmet`, `express-rate-limit`, `stripe`, `tsx`,
+`typescript`, `vitest`, `dotenv`.
+
+## Live site
+
+- Live: _to be added after deployment_
+- Server repo: https://github.com/rahatlab/pizza-hub-server
+- Client repo: https://github.com/rahatlab/pizza-hub-client
+
 ## Getting started
 
 ```bash
@@ -48,8 +60,18 @@ Admin accounts are **never** creatable through the public sign-up endpoint.
 | `STRIPE_SECRET_KEY` | no | vendor Premium checkout |
 | `STRIPE_WEBHOOK_SECRET` | no | webhook signature verification |
 | `STRIPE_PRICE_ID` | no | recurring price for Premium |
-| `PUBLISH_KEY` | no | Stripe publishable key (client) |
+| `STRIPE_PUBLISHABLE_KEY` | no | Stripe publishable key (client) |
 | `IMGBB_API_KEY` | no | menu item image hosting |
+
+## Features
+
+- Role-based auth (customer / vendor / admin) via Better Auth + JWT
+- Vendor menu CRUD with ImgBB upload + approval workflow
+- Order management with status timeline (actor names)
+- Stripe Premium subscription (webhook-verified)
+- Admin user management (search, role change, block/unblock)
+- Admin menu moderation (approve/reject/delete)
+- Block enforcement server-side (403 for blocked users)
 
 ## API overview
 
@@ -96,12 +118,13 @@ All responses use a consistent envelope: `{ success, data, message? }` or `{ suc
 - `GET /api/vendor/orders` — vendor's orders
 
 ### Admin
-- `GET /api/admin/menu` — all items (all statuses)
-- `GET /api/admin/users` — user list (role filter)
+- `GET /api/admin/menu` — all items (all statuses, search)
+- `GET /api/admin/users` — user list (role filter, search)
 - `GET /api/admin/stats` — platform overview
 - `GET /api/admin/transactions` — subscription transactions
 - `GET /api/admin/orders` — all orders
 - `PATCH /api/admin/users/:id/role` — change role
+- `PATCH /api/admin/users/:id/block` — block/unblock user
 
 ### Stripe
 - `POST /api/stripe/checkout` — create Premium checkout session
@@ -123,10 +146,11 @@ All responses use a consistent envelope: `{ success, data, message? }` or `{ suc
 - Premium activated **only** after a verified Stripe webhook (`checkout.session.completed`)
 - Role verified server-side on every protected API
 - Order status transitions validated (no skipping steps)
+- Blocked users cannot access protected features (403)
 
 ## Database collections
 
-- `users` — accounts (role, plan, favorites, vendor fields)
+- `users` — accounts (role, plan, favorites, vendor fields, isBlocked)
 - `accounts` — Better Auth credentials (password hash)
 - `sessions` — Better Auth sessions
 - `menuitems` — menu items with embedded reviews
@@ -145,4 +169,3 @@ All responses use a consistent envelope: `{ success, data, message? }` or `{ suc
 ## License
 
 MIT
-EOF
